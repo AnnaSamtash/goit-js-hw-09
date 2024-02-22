@@ -3,14 +3,16 @@ const messageOfInput = form.elements.message;
 const emailOfInput = form.elements.email;
 const localStorageKey = 'feedback-form-state';
 
-const dataFromLocalStorage = localStorage.getItem(localStorageKey) ?? '';
+const dataFromLocalStorage = localStorage.getItem(localStorageKey);
 if (dataFromLocalStorage) {
-  const { email = '', message = '' } = JSON.parse(dataFromLocalStorage);
-  if (message) {
-    messageOfInput.value = message;
-  }
-  if (email) {
-    emailOfInput.value = email;
+  try {
+    const parsedData = JSON.parse(dataFromLocalStorage);
+    if (parsedData && typeof parsedData === 'object') {
+      messageOfInput.value = parsedData.message ?? '';
+      emailOfInput.value = parsedData.email ?? '';
+    }
+  } catch (error) {
+    console.error('Error parsing data from local storage:', error);
   }
 }
 
@@ -18,27 +20,27 @@ form.addEventListener('input', saveData);
 form.addEventListener('submit', uploadData);
 
 function saveData() {
-  if (emailOfInput.value !== "" && messageOfInput.value !== "") {
-    const dataOfInput = {
-      email: emailOfInput.value,
-      message: messageOfInput.value,
-    };
-    const trimedDataOfInput = trimValues(dataOfInput);
-    localStorage.setItem(localStorageKey, JSON.stringify(trimedDataOfInput));
-  }
+  const dataOfInput = {
+    email: emailOfInput.value,
+    message: messageOfInput.value,
+  };
+  const trimedDataOfInput = trimValues(dataOfInput);
+  localStorage.setItem(localStorageKey, JSON.stringify(trimedDataOfInput));
 }
 
 function trimValues(obj) {
-  for (let key in obj) {
-    obj[key] = obj[key].trim();
+  const arrOfKeyVal = Object.entries(obj);
+  let trimedObj = {};
+  for (const [key, value] of arrOfKeyVal) {
+    trimedObj[key] = value.toString().trim();
   }
-  return obj;
+  return trimedObj;
 }
 
 function uploadData(evt) {
   evt.preventDefault();
-  if (emailOfInput.value === "" || messageOfInput.value === "") {
-    alert("Download all input fields");
+  if (emailOfInput.value === '' || messageOfInput.value === '') {
+    alert('Download all input fields');
     return;
   }
   console.log({
@@ -48,4 +50,3 @@ function uploadData(evt) {
   localStorage.removeItem(localStorageKey);
   form.reset();
 }
-
