@@ -39,13 +39,15 @@ function trimValues(obj) {
 
 function uploadData(evt) {
   evt.preventDefault();
-  if (emailOfInput.value === '' || messageOfInput.value === '') {
-    alert('Download all input fields');
+  const email = evt.target.elements.email.value.trim();
+  const message = evt.target.elements.message.value.trim();
+  if (email === '' || message === '') {
+    alert('Please complete all the fields!');
     return;
   }
   console.log({
-    email: evt.target.elements.email.value,
-    message: evt.target.elements.message.value,
+    email,
+    message,
   });
   localStorage.removeItem(localStorageKey);
   form.reset();
